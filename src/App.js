@@ -1,10 +1,18 @@
-import Example from './components/Nav';
-import Home from './Home';
+import About from './components/About';
+import Contact from './components/Contact';
+import Footer from './components/Footer';
+import Navbar from './components/Navbar';
+import Projects from './components/Porjects';
+
 function App() {
   return (
     <div className="App">
-      <Example />
-      <Home/>
+      <Navbar/>
+      <About/>
+      <Projects/>
+      <Contact/>
+      <Footer/>
+      {/* <Home/> */}
     </div>
   );
 }

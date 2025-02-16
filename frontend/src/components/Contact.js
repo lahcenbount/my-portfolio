@@ -1,8 +1,41 @@
+import React, { useState } from 'react';
+import axios from 'axios';
 import { motion } from 'framer-motion';
 import { FiMail, FiPhone, FiGithub, FiLinkedin } from 'react-icons/fi';
 
-
 export default function Contact() {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    message: '',
+  });
+
+  const [loading, setLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setErrorMessage('');
+    setSuccessMessage('');
+
+    try {
+      const response = await axios.post('http://localhost:3000/api/contact', formData);
+      setSuccessMessage(response.data.message);
+      setFormData({ name: '', email: '', message: '' }); // Reset form
+    } catch (error) {
+      setErrorMessage(error.response?.data?.error || 'An error occurred while sending the message.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <section id="contact" className="min-h-screen py-20 bg-gray-900 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
@@ -28,12 +61,16 @@ export default function Contact() {
             transition={{ duration: 0.5 }}
             className="bg-gray-800 rounded-2xl p-6 sm:p-8 shadow-xl"
           >
-            <form className="space-y-6">
+            <form className="space-y-6" onSubmit={handleSubmit}>
               <div>
                 <label className="block text-gray-300 mb-2">Nom</label>
                 <input
                   type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
                   className="w-full px-4 py-3 bg-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none text-gray-100"
+                  required
                 />
               </div>
 
@@ -41,7 +78,11 @@ export default function Contact() {
                 <label className="block text-gray-300 mb-2">Email</label>
                 <input
                   type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
                   className="w-full px-4 py-3 bg-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none text-gray-100"
+                  required
                 />
               </div>
 
@@ -49,16 +90,29 @@ export default function Contact() {
                 <label className="block text-gray-300 mb-2">Message</label>
                 <textarea
                   rows="5"
+                  name="message"
+                  value={formData.message}
+                  onChange={handleChange}
                   className="w-full px-4 py-3 bg-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none text-gray-100"
+                  required
                 ></textarea>
               </div>
+
+              {successMessage && (
+                <div className="text-green-400 text-center">{successMessage}</div>
+              )}
+              {errorMessage && (
+                <div className="text-red-400 text-center">{errorMessage}</div>
+              )}
 
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                type="submit"
+                disabled={loading}
                 className="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300"
               >
-                Envoyer le message
+                {loading ? 'Sending...' : 'Envoyer le message'}
               </motion.button>
             </form>
           </motion.div>
@@ -77,7 +131,7 @@ export default function Contact() {
               <div>
                 <h3 className="text-xl text-gray-300 mb-1">Email</h3>
                 <a href="mailto:lahcen@oukharmouch.com" className="text-gray-400 hover:text-indigo-400 transition-colors">
-                    lahcen@oukharmouch.com
+                  lahcen@oukharmouch.com
                 </a>
               </div>
             </div>
